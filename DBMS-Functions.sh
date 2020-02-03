@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-. ./dbmsTest.sh
+
 echo "What you want to do with this DB";
 
 
@@ -13,9 +13,50 @@ do
  select option in "List Tables" "Create New Table" "Insert Data" "Delete From Table" "Select From Table"
  do
 
-#List the database tables
+#create a new table
   case $option in
-   "List Tables")
+   "Create New Table")
+    echo "Enter the name of the table: ";
+    read tableName;
+    if [ -f $tableName]
+     then
+      echo "Table already exist";
+    else
+     touch $tableName.metadata;
+      if [ $? -eq 0 ] then
+       echo "Enter the number of column";
+       read colNumber;
+       echo "The Number Of Columns Is: $colNumber" >> $tableName.metadata;
+       for (( i = 1; i <= colNumber ; i++ )); do
+        echo "Enter the column number [$i]: ";
+        read colName;
+        PS3="Choose Column $colName Type";
+         select colType in Integer String
+         do
+          case $colType in
+      	   "Integer")
+	    echo -e ":Integer" >> $tableName.metadata;
+      	    break;
+      	    ;;
+      	   "String")
+	    echo -e ":String" >> $tableName.metadata;
+      	    break;
+      	    ;;
+      	   *)
+	    echo "You Must Choose a DataType for this column";
+            ;;
+      	  esac
+      	   done
+        done
+        echo "Table Created Successfully";
+       else
+        echo "Error while creating the table";
+       fi
+     fi
+;;
+
+#List the database tables
+"List Tables")
     if [ $dataBaseList/$dbName -eq 0 ]
      then
       echo "There is no tables in this database";
@@ -25,51 +66,14 @@ do
      break;
      ;;
 
-#create a new table
-   "Create New Table")
-    echo "Enter the name of the table: ";
-    read tableName;
-    if [ -f $tableName]
-     then
-      echo "Table already exist";
-    else
-     touch $dataBaseContent/$dbName/$tableName;
-      if [ $? -eq 0 ] then
-       echo "Enter the number of column";
-       read colNumber;
-       for (( i = 1; i <= colNumber ; i++ )); do
-        echo "Enter the column number [$i]: ";
-        read colName;
-        PS3="Choose Column $colName Type";
-         select colType in Number String
-         do
-          case $colType in
-      	   "Number")
-	    echo -e ":Number" >> $dataBaseContent/$dbName/$tableName;
-      	    break;
-      	    ;;
-      	   "String")
-	    echo -e ":String" >> $dataBaseContent/$dbName/$tableName;
-      	    break;
-      	    ;;
-      	   *)
-	    echo "You Must Choose a DataType for this column";
-            ;;
-      	  esac
-      	   done
-        done
-#we must handle the primary_key case 
-        echo "Table Created Successfully";
-       else
-        echo "Error while creating the table";
-       fi
-     fi
 
 #insert data into table
     "Insert Data")
+;;
 
 #Delete From Table
     "Delete From Table")
+;;
 
 #Select From Table
     "Select From Table")
