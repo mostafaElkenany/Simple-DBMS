@@ -13,7 +13,7 @@ do
  select option in "List Tables" "Create New Table" "Insert Data" "Delete From Table" "Select From Table"
  do
 
-#create a new table
+# #create a new table
   case $option in
    "Create New Table")
     echo "Enter the name of the table: ";
@@ -22,8 +22,9 @@ do
      then
       echo "Table already exist";
     else
-     touch $tableName.metadata;
-      if [ $? -eq 0 ] then
+      touch $tableName.metadata;
+      if [ $? -eq 0 ] 
+	  then
        echo "Enter the number of column";
        read colNumber;
        echo "The Number Of Columns Is: $colNumber" >> $tableName.metadata;
@@ -31,7 +32,7 @@ do
         echo "Enter the column number [$i]: ";
         read colName;
         PS3="Choose Column $colName Type";
-         select colType in Integer String
+         select colType in "Integer" "String"
          do
           case $colType in
       	   "Integer")
@@ -53,9 +54,9 @@ do
         echo "Error while creating the table";
        fi
      fi
-;;
+     ;;
 
-#List the database tables
+# #List the database tables
 "List Tables")
     if [ $dataBaseList/$dbName -eq 0 ]
      then
@@ -67,7 +68,7 @@ do
      ;;
 
 
-#insert data into table
+# #insert data into table
     "Insert Data")
 ;;
 
@@ -79,46 +80,19 @@ do
     "Select From Table")
      echo "Enter table name to select its data"
      read tableSelected
-     if [ $tableSelected -eq $tableName] then
+     if [ $tableSelected -eq $tableName] 
+	 then
       cat $tableSelected;
      else
       echo "Table doesn't exist";
      fi
+	;;
+	esac
+  done
+done
 #here we must show a list of available columns
 
         
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
 #create a new database
 function createTable{
 	echo "enter table name: ";
@@ -177,5 +151,4 @@ function selectfromTable{
 		cat $table;	
 	done
 }
-*/
 
