@@ -1,15 +1,10 @@
 #!/usr/bin/bash
 
-
-echo "What you want to do with this DB";
-
-
-
 clear;
-PS3="Select an Option";
 
 while [ $? -eq 0 ]
 do
+ PS3="Select an Option";
  select option in "List Tables" "Create New Table" "Insert Data" "Delete From Table" "Select From Table"
  do
 
@@ -18,51 +13,55 @@ do
    "Create New Table")
     echo "Enter the name of the table: ";
     read tableName;
-    if [ -f $tableName]
+    if [ -f $tableName.data ]
      then
       echo "Table already exist";
     else
       touch $tableName.metadata;
+	  touch $tableName.data;
       if [ $? -eq 0 ] 
 	  then
        echo "Enter the number of column";
        read colNumber;
-       echo "The Number Of Columns Is: $colNumber" >> $tableName.metadata;
-       for (( i = 1; i <= colNumber ; i++ )); do
-        echo "Enter the column number [$i]: ";
+    #    echo "The Number Of Columns Is: $colNumber" >> $tableName.metadata;
+       for (( i = 1; i <= colNumber ; i++ )); 
+	   do
+        echo "Enter name for column number [$i]: ";
         read colName;
-        PS3="Choose Column $colName Type";
+        PS3="Choose Column $colName data type";
          select colType in "Integer" "String"
          do
           case $colType in
       	   "Integer")
-	    echo -e ":Integer" >> $tableName.metadata;
-      	    break;
+	          echo -e "$colName:Integer" >> $tableName.metadata;
+      	      break;
       	    ;;
       	   "String")
-	    echo -e ":String" >> $tableName.metadata;
-      	    break;
+	          echo -e "$colName:String" >> $tableName.metadata;
+      	      break;
       	    ;;
       	   *)
-	    echo "You Must Choose a DataType for this column";
+	          echo "You Must Choose a DataType for this column";
             ;;
       	  esac
-      	   done
+      	 done
         done
-        echo "Table Created Successfully";
-       else
+         echo "Table Created Successfully";
+      else
         echo "Error while creating the table";
-       fi
-     fi
+      fi
+    fi
+	 break;
      ;;
 
 # #List the database tables
 "List Tables")
-    if [ $dataBaseList/$dbName -eq 0 ]
+    if [ -z "$(ls)" ]
      then
       echo "There is no tables in this database";
      else
-      echo "The tables in this database are: "$dataBaseList/$dbName;
+      echo "The tables in this database are: ";
+	  ls;
      fi
      break;
      ;;

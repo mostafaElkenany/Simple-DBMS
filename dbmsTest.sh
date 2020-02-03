@@ -1,28 +1,28 @@
 #!/usr/bin/bash
 
  echo "myDB DBMS is running";   
- mkdir -p myDB/Databases ;
- cd myDB/Databases ; 
+ mkdir -p /home/~/myDB/Databases ;
+ cd /home/~/myDB/Databases ; 
 
 
  clear;
  PS3="Choose option: ";
- while [ 1 -eq 1 ]
+ while true
  do
  select choice in "Create Database" "Show Databases" "Connect to a Database" "Drop Database" "Exit"
  do
   case $choice in
    "Create Database")
     echo "Enter database name:"
-    read dbName;
-    if [ -d $dbName ]
+    read db;
+    if [ -d $db ]
     then
      echo "Database with the same name already exists!!"
     else
-    mkdir $dbName;
+    mkdir $db;
     echo "Database created successfully"
     fi
-   break;
+    break;
     ;;
    "Show Databases")
    ls;
@@ -35,7 +35,8 @@
    if [ -d $db ]
    then
     cd $db;
-    echo "Now connected to Database $db"; 
+    echo "Now connected to Database $db";
+     
    else
     echo "Database $db not found!!";
    fi 
@@ -58,8 +59,8 @@
    ;; 
 
    "Exit")
-   break 2;
-   ;;
+    break 2;
+    ;;
   esac
  done
  done
