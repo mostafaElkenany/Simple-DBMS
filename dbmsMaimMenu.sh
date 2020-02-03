@@ -1,8 +1,9 @@
 #!/usr/bin/bash
+. tableMenu.sh 
 
  echo "myDB DBMS is running";   
- mkdir -p /home/~/myDB/Databases ;
- cd /home/~/myDB/Databases ; 
+ mkdir -p ~/myDB/Databases ;
+ cd ~/myDB/Databases ; 
 
 
  clear;
@@ -30,13 +31,12 @@
    ;;
    "Connect to a Database")
    ls;
-   echo "Select Database you want to connect to: "
-   read db;
+   read -p "Select Database you want to connect to: " db;
    if [ -d $db ]
    then
     cd $db;
     echo "Now connected to Database $db";
-     
+    tableOptions;
    else
     echo "Database $db not found!!";
    fi 
