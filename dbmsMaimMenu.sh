@@ -1,5 +1,6 @@
 #!/usr/bin/bash
 . tableMenu.sh 
+shopt -s extglob;
 
  echo "myDB DBMS is running";   
  mkdir -p ~/myDB/Databases ;
@@ -15,8 +16,7 @@
   case $choice in
    "Create Database")
     clear ;
-    echo "Enter database name:"
-    read db;
+    read -p "Enter database name:" db;
     if [ -d $db ]
     then
      echo "Database with the same name already exists!!"

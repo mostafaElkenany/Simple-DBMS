@@ -50,6 +50,32 @@ function insert {
     break;
 }
 
+function deleteRow {
+
+        read -p "Select table:  " table;
+      if [ -f $table.data ]
+      then
+        #check if table is empty
+        if [ -z "$(cat $table.data)" ]
+        then
+          echo "table is empty";
+        else
+          read -p "Enter row number you want to delete:  " num;
+          #check if row exists
+          if [ -z "$(sed -n "${num}p" $table.data)" ]
+          then
+            echo "Row does not exist";
+          else  
+            sed -i "${num}d" $table.data;
+            echo "Row deleted successfully";
+          fi  
+        fi
+      else
+          echo "Table not found!!";  
+      fi
+
+}
+
 function tableOptions {	
 clear;
 
@@ -130,7 +156,9 @@ do
 
 #Delete From Table
     "Delete From Table")
-
+      clear;
+      deleteRow;
+      break; 
     ;;
 
 #Select From Table
