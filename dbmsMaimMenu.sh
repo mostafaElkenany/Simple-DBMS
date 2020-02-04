@@ -7,13 +7,14 @@
 
 
  clear;
- PS3="Choose option: ";
  while true
  do
+ PS3="Choose option: ";
  select choice in "Create Database" "Show Databases" "Connect to a Database" "Drop Database" "Exit"
  do
   case $choice in
    "Create Database")
+    clear ;
     echo "Enter database name:"
     read db;
     if [ -d $db ]
@@ -26,10 +27,13 @@
     break;
     ;;
    "Show Databases")
+   clear ;
    ls;
    break;
    ;;
    "Connect to a Database")
+   clear ;
+   echo "Available databases: " ;
    ls;
    read -p "Select Database you want to connect to: " db;
    if [ -d $db ]
@@ -45,9 +49,9 @@
 
 
    "Drop Database")
+   clear ;
    ls;
-   echo "Select Database you want to delete: "
-   read db;
+   read -p "Select Database you want to delete: " db;
    if [ -d $db ]
    then
     rm -r $db;
@@ -59,6 +63,7 @@
    ;; 
 
    "Exit")
+    cd ~ ;
     break 2;
     ;;
   esac

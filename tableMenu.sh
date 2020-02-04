@@ -1,16 +1,68 @@
 #!/usr/bin/bash
+
+function list {
+      if [ -z "$(ls)" ]
+     then
+      echo "There is no tables in this database";
+     else
+      echo "The tables in this database are: ";
+      ls | cut -d "." -f 1 | sort -u ;
+     fi  
+}
+
+function insert {
+    row="";
+    for col in `awk '{print $1}' $tableName.metadata`
+    do
+        columnName=$(echo $col|cut -d ':' -f 1) ;
+        columnType=$(echo $col|cut -d ':' -f 2);
+        read -p "Enter $columnName value: " val;
+
+        #validation for string datatype
+        if test $columnType = "String"
+        then
+            while [ -z $val ] || [ "$val" -eq "$val" ] 2>/dev/null;
+            do
+              echo "invalid datatype!, $columnName column datatype is string";
+              read -p "Enter $columnName value: " val;
+            done
+        fi
+
+        #validation for integer datatype
+        if test $columnType = "Integer"
+        then
+            while ! [ "$val" -eq "$val" ] 2>/dev/null;
+            do
+              echo "invalid datatype!, $columnName column datatype is integer";
+              read -p "Enter $columnName value: " val;
+            done
+        fi
+
+        #appending row to table with "," as delimeter
+        if test -z $row
+        then
+            row=$val
+        else
+            row=$row","$val;
+        fi
+    done
+    echo "$row" >> $tableName.data;
+    break;
+}
+
 function tableOptions {	
 clear;
 
 while [ $? -eq 0 ]
 do
- PS3="Select an Option";
- select option in "List Tables" "Create New Table" "Insert Data" "Delete From Table" "Select From Table"
+ PS3="Select an Option:  ";
+ select option in "List Tables" "Create New Table" "Insert Data" "Delete From Table" "Select From Table" "Drop table" "Back to main menu"
  do
 
 # #create a new table
   case $option in
    "Create New Table")
+    clear ;
     echo "Enter the name of the table: ";
     read tableName;
     if [ -f $tableName.data ]
@@ -54,33 +106,32 @@ do
 	 break;
      ;;
 
-# #List the database tables
-"List Tables")
-    if [ -z "$(ls)" ]
-     then
-      echo "There is no tables in this database";
-     else
-      echo "The tables in this database are: ";
-	  ls;
-     fi
+#List the database tables
+  "List Tables")
+     clear; 
+     list;
      break;
      ;;
 
 
-# #insert data into table
-    "Insert Data")
-	read -p "Select the table you want to insert into:  " tableName;
-	 if [ -f $tableName.data ]
-	 then
+#insert data into table
+  "Insert Data")
+    clear ;
+    list;
+	  read -p "Select the table you want to insert into:  " tableName;
+  	if [ -f $tableName.data ]
+	  then
 	    insert;
-	 else 
-	 	echo "not found";		
-	 fi
-     ;;
+	  else 
+	 	echo "not found";
+    break; 		
+	  fi
+    ;;
 
 #Delete From Table
     "Delete From Table")
-;;
+
+    ;;
 
 #Select From Table
     "Select From Table")
@@ -92,7 +143,28 @@ do
      else
       echo "Table doesn't exist";
      fi
-	;;
+	  ;;
+
+    "Drop table")
+      clear;
+      list;
+      read -p "Select table you want to delete: " table;
+      if [ -f $table.data ]
+      then
+      rm  $table.data;
+      rm  $table.metadata;
+      echo "Table $table deleted successfully"; 
+      else
+      echo "Table $table not found!!";
+      fi 
+      break;
+    ;;
+
+   "Back to main menu")
+      cd .. ;
+      clear;
+      break 2;
+   ;;
 	esac
   done
 done
@@ -101,7 +173,7 @@ done
 
         
 #create a new database
-function createTable{
+function createTable {
 	echo "enter table name: ";
 	read tbName;
 	if [ ! -e $dataBaseList/$tbName ] && [ $tbName != "" ]
@@ -116,78 +188,13 @@ function createTable{
 					 echo "enter column name num $z "	
 }
 
-#list tables in a selected DB
 
-function listTables{
-	i=1;
-	for table in $dataBaseList/$tbName
-	do
-		$tbArr[$i]=$table;
-		let $i++;
-	done
 
-	if [ $tbArr -eq 0 ]
-		then
-			echo "Sorry, there is no tables like that to list";
-			return ;
-	fi
-	
-	echo "The tables availbale in this database are: ";
-
-	i=1
-	for table in `ls $dataBaseList`
-	do
-		$tbArr[$i]=$table;
-		echo $i") "$table;
-		let i=i+1;
-	done
-}
-
-function insert {
-    row="";
-    for col in `awk '{print $1}' $tableName.metadata`
-    do
-        columnName=$(echo $col|cut -d ':' -f 1) ;
-        columnType=$(echo $col|cut -d ':' -f 2);
-        read -p "Enter $columnName value: " val;
-
-        #validation for string datatype
-        if test $columnType = "String"
-        then
-            while [ -z $val ] || [ "$val" -eq "$val" ] 2>/dev/null;
-            do
-              echo "invalid datatype!, $columnName column datatype is string";
-              read -p "Enter $columnName value: " val;
-            done
-        fi
-
-        #validation for integer datatype
-        if test $columnType = "Integer"
-        then
-            while ! [ "$val" -eq "$val" ] 2>/dev/null;
-            do
-              echo "invalid datatype!, $columnName column datatype is integer";
-              read -p "Enter $columnName value: " val;
-            done
-        fi
-
-        #appending row to table with , as
-        if test -z $row
-        then
-            row=$val
-        else
-            row=$row","$val;
-        fi
-    done
-    echo "$row" >> $tableName.data;
-    break;
-}
-
-function deletefromTable{
+function deletefromTable {
 
 }
 
-function selectfromTable{
+function selectfromTable {
 
 	for table in $dataBaseList/$tbName
 	do
