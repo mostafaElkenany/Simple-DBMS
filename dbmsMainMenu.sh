@@ -17,12 +17,17 @@ shopt -s extglob;
    "Create Database")
     clear ;
     read -p "Enter database name:" db;
+    if [[ ! $db  =~ ^[a-zA-Z_]+[a-zA-Z]+[0-9a-zA-Z_]*$ ]]; 
+    then
+    echo "Invalid format, DB name must start with string only!!";
+    else
     if [ -d $db ]
     then
      echo "Database with the same name already exists!!"
     else
     mkdir $db;
     echo "Database created successfully"
+    fi
     fi
     break;
     ;;

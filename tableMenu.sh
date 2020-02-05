@@ -10,9 +10,56 @@ function list {
      fi  
 }
 
+function createTable {
+read -p "Enter the name of the table: " tableName;
+if [[ ! $tableName  =~ ^[a-zA-Z_]+[a-zA-Z]+[0-9a-zA-Z_]*$ ]]; 
+then
+echo "Invalid format, Table name must start with string only!!";
+else
+    if [ -f $tableName ]
+     then
+      echo "Table already exist";
+    else
+      touch .$tableName.metadata;
+	  touch $tableName;
+      if [ $? -eq 0 ] 
+	  then
+       read -p "Enter the number of column: " colNumber;
+       for (( i = 1; i <= colNumber ; i++ )); 
+	   do
+        read -p "Enter name for column number [$i]: " colName;
+        
+        PS3="Choose Column $colName data type";
+         select colType in "Integer" "String"
+         do
+          case $colType in
+      	   "Integer")
+	          echo -e "$colName:Integer" >> .$tableName.metadata;
+            echo -e "$colName" >> $tableName;
+      	      break;
+      	    ;;
+      	   "String")
+	          echo -e "$colName:String" >> .$tableName.metadata;
+            echo -e "$colName" >> $tableName;
+      	      break;
+      	    ;;
+      	   *)
+	          echo "You Must Choose a DataType for this column";
+            ;;
+      	  esac
+      	 done
+        done
+         echo "Table Created Successfully";
+      else
+        echo "Error while creating the table";
+      fi
+    fi
+    fi
+}
+
 function insert {
     row="";
-    for col in `awk '{print $1}' $tableName.metadata`
+    for col in `awk '{print $1}' .$tableName.metadata`
     do
         columnName=$(echo $col|cut -d ':' -f 1) ;
         columnType=$(echo $col|cut -d ':' -f 2);
@@ -24,7 +71,7 @@ function insert {
             while [ -z $val ] || [ "$val" -eq "$val" ] 2>/dev/null;
             do
               echo "invalid datatype!, $columnName column datatype is string";
-              read -p "Enter $columnName value: " val;
+              read -p "Enter the value of $columnName column: " val;
             done
         fi
 
@@ -46,27 +93,80 @@ function insert {
             row=$row","$val;
         fi
     done
-    echo "$row" >> $tableName.data;
+    echo "$row" >> $tableName;
     break;
+}
+
+function selectRow {
+
+      #echo "The available tables in this DB: ";
+      list;
+      echo "------------------------------------------";
+      read -p "Select table:  " table;
+      if [ -f $table ]
+      then
+        #check if table is empty
+        if [ -z "$(cat $table)" ]
+        then
+          echo "table is empty";
+        else
+          read -p "Enter row number you want to retrieve:  " num;
+          #check if row exists
+          if [ -z "$(sed -n "${num}p" $table)" ]
+          then
+            echo "Row does not exist";
+          else  
+            sed -n "${num}p" $table | column -t -s ",";
+          fi  
+        fi
+      else
+          echo "Table not found!!";  
+      fi
+}
+
+function selectAll {
+if [ -f $tableName ]
+    then
+    echo "The available tables in this DB: ";
+     ls;
+     echo "------------------------------------------";
+     read -p "Enter table name to select: " availableTable;
+     if [ -f $availableTable ]
+     then
+     #check if table is empty
+    if [ -z "$(cat $availableTable)" ]
+    then
+    echo "table is empty";
+    else
+     #awk '{print $1}' .$availableTable.metadata | cut -d ':' -f 1 | tr '\n' ' ' | column -t;
+     echo "retrieved data for 1 table";
+     awk '{print NR,$0}' $availableTable | column -t -s ",";
+     fi
+     else
+     echo "This table doesn't exist in the DB";
+     fi
+    else
+    echo "There is no table in this DB";
+     fi
 }
 
 function deleteRow {
 
         read -p "Select table:  " table;
-      if [ -f $table.data ]
+      if [ -f $table ]
       then
         #check if table is empty
-        if [ -z "$(cat $table.data)" ]
+        if [ -z "$(cat $table)" ]
         then
           echo "table is empty";
         else
           read -p "Enter row number you want to delete:  " num;
           #check if row exists
-          if [ -z "$(sed -n "${num}p" $table.data)" ]
+          if [ -z "$(sed -n "${num}p" $table)" ]
           then
             echo "Row does not exist";
           else  
-            sed -i "${num}d" $table.data;
+            sed -i "${num}d" $table;
             echo "Row deleted successfully";
           fi  
         fi
@@ -76,63 +176,38 @@ function deleteRow {
 
 }
 
+function dropTable {
+read -p "Select table you want to delete: " table;
+      if [ -f $table ]
+      then
+      rm  $table;
+      rm  .$table.metadata;
+      echo "Table $table deleted successfully"; 
+      else
+      echo "Table $table not found!!";
+      fi 
+}
+
+
+
 function tableOptions {	
 clear;
 
 while [ $? -eq 0 ]
 do
  PS3="Select an Option:  ";
- select option in "List Tables" "Create New Table" "Insert Data" "Delete From Table" "Select From Table" "Drop table" "Back to main menu"
+ select option in "Create New Table" "List Tables" "Insert Data" "Select Row" "Select all From Table" "Delete Row From Table" "Drop Table" "Back to main menu"
  do
 
-# #create a new table
+# create a new table
   case $option in
-   "Create New Table")
-    clear ;
-    echo "Enter the name of the table: ";
-    read tableName;
-    if [ -f $tableName.data ]
-     then
-      echo "Table already exist";
-    else
-      touch $tableName.metadata;
-	  touch $tableName.data;
-      if [ $? -eq 0 ] 
-	  then
-       echo "Enter the number of column";
-       read colNumber;
-    #    echo "The Number Of Columns Is: $colNumber" >> $tableName.metadata;
-       for (( i = 1; i <= colNumber ; i++ )); 
-	   do
-        echo "Enter name for column number [$i]: ";
-        read colName;
-        PS3="Choose Column $colName data type";
-         select colType in "Integer" "String"
-         do
-          case $colType in
-      	   "Integer")
-	          echo -e "$colName:Integer" >> $tableName.metadata;
-      	      break;
-      	    ;;
-      	   "String")
-	          echo -e "$colName:String" >> $tableName.metadata;
-      	      break;
-      	    ;;
-      	   *)
-	          echo "You Must Choose a DataType for this column";
-            ;;
-      	  esac
-      	 done
-        done
-         echo "Table Created Successfully";
-      else
-        echo "Error while creating the table";
-      fi
-    fi
-	 break;
-     ;;
+  "Create New Table")
+    clear;
+    createTable;
+    break;
+  ;;
 
-#List the database tables
+# List The Database Tables
   "List Tables")
      clear; 
      list;
@@ -140,93 +215,57 @@ do
      ;;
 
 
-#insert data into table
+# Insert Data Into Table
   "Insert Data")
     clear ;
     list;
 	  read -p "Select the table you want to insert into:  " tableName;
-  	if [ -f $tableName.data ]
+  	if [ -f $tableName ]
 	  then
 	    insert;
 	  else 
-	 	echo "not found";
+	 	echo "Table not found";
     break; 		
 	  fi
     ;;
 
-#Delete From Table
-    "Delete From Table")
-      clear;
-      deleteRow;
-      break; 
-    ;;
-
-#Select From Table
-    "Select From Table")
-     echo "Enter table name to select its data"
-     read tableSelected
-     if [ $tableSelected -eq $tableName] 
-	 then
-      cat $tableSelected;
-     else
-      echo "Table doesn't exist";
-     fi
-	  ;;
-
-    "Drop table")
-      clear;
-      list;
-      read -p "Select table you want to delete: " table;
-      if [ -f $table.data ]
-      then
-      rm  $table.data;
-      rm  $table.metadata;
-      echo "Table $table deleted successfully"; 
-      else
-      echo "Table $table not found!!";
-      fi 
-      break;
-    ;;
-
-   "Back to main menu")
-      cd .. ;
-      clear;
-      break 2;
+# Select Row From Table
+   "Select Row")
+   clear;
+   selectRow;
+   break;
    ;;
-	esac
+
+# Select all From Table
+    "Select all From Table")
+    clear;
+    selectAll;
+    break;
+    ;;
+
+# Delete From Table
+    "Delete Row From Table")
+    clear;
+    deleteRow;
+    break; 
+    ;;
+
+
+# Drop Table
+    "Drop Table")
+     clear;
+     list;
+     dropTable;
+     break;
+     ;;
+
+# Back To Main Menu
+   "Back to main menu")
+    cd .. ;
+    clear;
+    break 2;
+    ;; 
+esac
   done
 done
 }
-#here we must show a list of available columns
-
-        
-#create a new database
-function createTable {
-	echo "enter table name: ";
-	read tbName;
-	if [ ! -e $dataBaseList/$tbName ] && [ $tbName != "" ]
-		then
-			touch $dataBaseList/$tbName;
-			if [ $? -eq 0]
-				then
-					echo "enter the number of columns";
-					read numOfCol;
-					for(( i = 1; i <= numOfCol ; i++ ))
-					do
-					 echo "enter column name num $z "	
-}
-
-
-
-function deletefromTable {
-
-}
-
-function selectfromTable {
-
-	for table in $dataBaseList/$tbName
-	do
-		cat $table;	
-	done
-}
-
