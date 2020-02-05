@@ -6,7 +6,7 @@ function list {
       echo "There is no tables in this database";
      else
       echo "The tables in this database are: ";
-      ls | cut -d "." -f 1 | sort -u ;
+      ls | sort -u ;
      fi  
 }
 
@@ -26,21 +26,19 @@ else
 	  then
        read -p "Enter the number of column: " colNumber;
        for (( i = 1; i <= colNumber ; i++ )); 
-	   do
+	     do
         read -p "Enter name for column number [$i]: " colName;
-        
-        PS3="Choose Column $colName data type";
+
+        PS3="Choose Column $colName data type: ";
          select colType in "Integer" "String"
          do
           case $colType in
       	   "Integer")
 	          echo -e "$colName:Integer" >> .$tableName.metadata;
-            echo -e "$colName" >> $tableName;
       	      break;
       	    ;;
       	   "String")
 	          echo -e "$colName:String" >> .$tableName.metadata;
-            echo -e "$colName" >> $tableName;
       	      break;
       	    ;;
       	   *)
@@ -138,8 +136,8 @@ if [ -f $tableName ]
     then
     echo "table is empty";
     else
-     #awk '{print $1}' .$availableTable.metadata | cut -d ':' -f 1 | tr '\n' ' ' | column -t;
-     echo "retrieved data for 1 table";
+    echo "retrieved data for 1 table";
+     awk '{print $1}' .$availableTable.metadata | cut -d ':' -f 1 | tr '\n' ' ' | column -t;
      awk '{print NR,$0}' $availableTable | column -t -s ",";
      fi
      else
