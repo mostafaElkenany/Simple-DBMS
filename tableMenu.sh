@@ -15,7 +15,6 @@ function list {
 function createTable {
 read -p "Enter the name of the table: " tableName;
 printf "\n";
-printf 
 if [[ ! $tableName  =~ ^[a-zA-Z_]+[a-zA-Z]+[0-9a-zA-Z_]*$ ]]; 
 then
 echo " Sorry, Invalid format!!";
@@ -27,16 +26,27 @@ else
       printf "\n";
     else
       touch .$tableName.metadata;
-	  touch $tableName;
+	    touch $tableName;
       if [ $? -eq 0 ] 
 	  then
        read -p "Enter the number of column: " colNumber;
        printf "\n";
+       #check if colNumber is integer
+       while ! [[ $colNumber =~ ^[1-9]*$ ]];
+       do
+         echo "Please enter a valid number greater than 0 ";
+         read -p "Enter the number of column: " colNumber;
+       done
        for (( i = 1; i <= colNumber ; i++ )); 
 	     do
-        read -p "Enter name for column number [$i]: " colName;
-
-        PS3="Choose Column $colName data type: ";
+         read -p "Enter name for column number [$i]: " colName;
+         while ! [ -z "$(grep $colName .$tableName.metadata)" ]
+         do
+          echo "column with the same name already exists, choose another name";
+          read -p "Enter name for column number [$i]: " colName;
+          printf "\n";
+         done
+         echo "Choose Column $colName data type: ";
          printf "\n";
          select colType in "Integer" "String"
          do
@@ -248,8 +258,7 @@ do
 # Insert Data Into Table
   "Insert Data")
     clear ;
-    echo "     ***************Available tables***************";
-      printf "\n";
+    printf "\n";
     list;
     printf "\n";
 	  read -p "Select the table you want to insert into:  " tableName;
