@@ -85,9 +85,9 @@ function insert {
         #validation for string datatype
         if test $columnType = "String"
         then
-            while [ -z $val ] || [ "$val" -eq "$val" ] 2>/dev/null;
+            while [ -z $val ] || [[ $val =~ [\,\;\:\-] ]] || [ "$val" -eq "$val" ] 2>/dev/null ;
             do
-              echo " invalid datatype!, $columnName column datatype is string";
+              echo " Invalid input!, empty value or special characters are not allowed";
               printf "\n";
               read -p "Enter the value of $columnName column: " val;
             done
@@ -98,7 +98,7 @@ function insert {
         then
             while ! [ "$val" -eq "$val" ] 2>/dev/null;
             do
-              echo " invalid datatype!, $columnName column datatype is integer";
+              echo " Invalid input!, $columnName column datatype is integer";
               read -p "Enter $columnName value: " val;
             done
         fi
