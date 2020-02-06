@@ -40,7 +40,7 @@ else
        for (( i = 1; i <= colNumber ; i++ )); 
 	     do
          read -p "Enter name for column number [$i]: " colName;
-         while ! [ -z "$(grep $colName .$tableName.metadata)" ]
+         while ! [ -z "$(grep -w $colName .$tableName.metadata)" ]
          do
           echo "column with the same name already exists, choose another name";
           read -p "Enter name for column number [$i]: " colName;
@@ -167,8 +167,10 @@ if [ -f $tableName ]
     printf "\n";
     else
     echo "retrieved data for 1 table";
-     awk '{print $0}' .$availableTable.metadata | cut -d ':' -f 1 | tr '\n' ' ' | column -t;
-     awk '{print NR,$0}' $availableTable | column -t -s ",";
+     awk 'BEGIN {print "ID"} {print $0}' .$availableTable.metadata | cut -d ':' -f 1 | tr '\n' ',' > tmp ;
+     echo "" >> tmp;
+     awk '{print NR","$0}' $availableTable >> tmp;
+     column -t -s "," tmp;
      fi
      else
      echo " Sorry, Table doesn't exist!!";
