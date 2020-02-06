@@ -10,6 +10,7 @@ shopt -s extglob;
  clear;
  while true
  do
+ printf "\n";
  PS3="Choose option: ";
  select choice in "Create Database" "Show Databases" "Connect to a Database" "Drop Database" "Exit"
  do
@@ -17,37 +18,49 @@ shopt -s extglob;
    "Create Database")
     clear ;
     read -p "Enter database name:" db;
+    printf "\n";
     if [[ ! $db  =~ ^[a-zA-Z_]+[a-zA-Z]+[0-9a-zA-Z_]*$ ]]; 
     then
-    echo "Invalid format, DB name must start with string only!!";
+    echo " Sorry, Invalid format!!";
+    printf "\n";
     else
     if [ -d $db ]
     then
-     echo "Database with the same name already exists!!"
+     echo " Database already exist!!";
+     printf "\n";
     else
     mkdir $db;
-    echo "Database created successfully"
+    echo "     ***************Database created successfully***************";
+    printf "\n";
     fi
     fi
     break;
     ;;
    "Show Databases")
    clear ;
+   echo "     ***************Available database(s)***************" ;
+   printf "\n";
    ls;
+   printf "\n";
    break;
    ;;
    "Connect to a Database")
    clear ;
-   echo "Available databases: " ;
+   echo "     ***************Available database(s)***************" ;
+   printf "\n";
    ls;
+   printf "\n";
    read -p "Select Database you want to connect to: " db;
+   printf "\n";
    if [ -d $db ]
    then
     cd $db;
-    echo "Now connected to Database $db";
+    echo "     ***************Now connected to Database $db***************";
+    printf "\n"
     tableOptions;
    else
-    echo "Database $db not found!!";
+    echo " Sorry, Database $db not found!!";
+    printf "\n"
    fi 
    break;
    ;;
@@ -55,14 +68,20 @@ shopt -s extglob;
 
    "Drop Database")
    clear ;
+   echo "     ***************Available database(s)***************" ;
+   printf "\n"
    ls;
+   printf "\n"
    read -p "Select Database you want to delete: " db;
+   printf "\n"
    if [ -d $db ]
    then
     rm -r $db;
-    echo "Database $db deleted successfully"; 
+    echo "     ***************Database $db deleted successfully***************"; 
+    printf "\n"
    else
-    echo "Database $db not found!!";
+    echo " Sorry, Database $db not found!!";
+    printf "\n"
    fi 
    break;
    ;; 

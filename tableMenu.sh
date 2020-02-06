@@ -3,34 +3,42 @@
 function list {
       if [ -z "$(ls)" ]
      then
-      echo "There is no tables in this database";
+      echo " There is no tables in this database!!";
      else
-      echo "The tables in this database are: ";
+      echo "     ***************Available tables***************";
+      printf "\n";
       ls | sort -u ;
+      printf "\n";
      fi  
 }
 
 function createTable {
 read -p "Enter the name of the table: " tableName;
+printf "\n";
+printf 
 if [[ ! $tableName  =~ ^[a-zA-Z_]+[a-zA-Z]+[0-9a-zA-Z_]*$ ]]; 
 then
-echo "Invalid format, Table name must start with string only!!";
+echo " Sorry, Invalid format!!";
+printf "\n";
 else
     if [ -f $tableName ]
      then
-      echo "Table already exist";
+      echo " Table already exist!!";
+      printf "\n";
     else
       touch .$tableName.metadata;
 	  touch $tableName;
       if [ $? -eq 0 ] 
 	  then
        read -p "Enter the number of column: " colNumber;
+       printf "\n";
        for (( i = 1; i <= colNumber ; i++ )); 
 	     do
         read -p "Enter name for column number [$i]: " colName;
 
         PS3="Choose Column $colName data type: ";
          select colType in "Integer" "String"
+         printf "\n";
          do
           case $colType in
       	   "Integer")
@@ -43,13 +51,14 @@ else
       	    ;;
       	   *)
 	          echo "You Must Choose a DataType for this column";
+            printf "\n";
             ;;
       	  esac
       	 done
         done
-         echo "Table Created Successfully";
+         echo "     ***************Table Created Successfully***************";
       else
-        echo "Error while creating the table";
+        echo " Error while creating the table!!";
       fi
     fi
     fi
@@ -68,7 +77,8 @@ function insert {
         then
             while [ -z $val ] || [ "$val" -eq "$val" ] 2>/dev/null;
             do
-              echo "invalid datatype!, $columnName column datatype is string";
+              echo " invalid datatype!, $columnName column datatype is string";
+              printf "\n";
               read -p "Enter the value of $columnName column: " val;
             done
         fi
@@ -78,7 +88,7 @@ function insert {
         then
             while ! [ "$val" -eq "$val" ] 2>/dev/null;
             do
-              echo "invalid datatype!, $columnName column datatype is integer";
+              echo " invalid datatype!, $columnName column datatype is integer";
               read -p "Enter $columnName value: " val;
             done
         fi
@@ -99,90 +109,111 @@ function selectRow {
 
       #echo "The available tables in this DB: ";
       list;
-      echo "------------------------------------------";
+      printf "\n";
       read -p "Select table:  " table;
+      printf "\n";
       if [ -f $table ]
       then
         #check if table is empty
         if [ -z "$(cat $table)" ]
         then
           echo "table is empty";
+          printf "\n";
         else
           read -p "Enter row number you want to retrieve:  " num;
+          printf "\n";
           #check if row exists
           if [ -z "$(sed -n "${num}p" $table)" ]
           then
-            echo "Row does not exist";
+            echo " Sorry, Row does not exist!!";
+            printf "\n";
           else  
             sed -n "${num}p" $table | column -t -s ",";
+            echo "     ***************retrieved 1 row successfully***************"
+            printf "\n";
           fi  
         fi
       else
-          echo "Table not found!!";  
+          echo " Sorry, Table not found!!";  
+          printf "\n";
       fi
 }
 
 function selectAll {
 if [ -f $tableName ]
     then
-    echo "The available tables in this DB: ";
+    echo "     ***************available tables***************";
+    printf "\n";
      ls;
-     echo "------------------------------------------";
+     printf "\n";
      read -p "Enter table name to select: " availableTable;
+     printf "\n";
      if [ -f $availableTable ]
      then
      #check if table is empty
     if [ -z "$(cat $availableTable)" ]
     then
-    echo "table is empty";
+    echo " Sorry, table is empty!!";
+    printf "\n";
     else
     echo "retrieved data for 1 table";
-     awk '{print $1}' .$availableTable.metadata | cut -d ':' -f 1 | tr '\n' ' ' | column -t;
+     awk '{print $0}' .$availableTable.metadata | cut -d ':' -f 1 | tr '\n' ' ' | column -t;
      awk '{print NR,$0}' $availableTable | column -t -s ",";
      fi
      else
-     echo "This table doesn't exist in the DB";
+     echo " Sorry, Table doesn't exist!!";
+     printf "\n";
      fi
     else
-    echo "There is no table in this DB";
+    echo " Sorry, table not found!!";
+    printf "\n";
      fi
 }
 
 function deleteRow {
 
         read -p "Select table:  " table;
+        printf "\n";
       if [ -f $table ]
       then
         #check if table is empty
         if [ -z "$(cat $table)" ]
         then
-          echo "table is empty";
+          echo " Sorry, table is empty!!";
+          printf "\n"
         else
           read -p "Enter row number you want to delete:  " num;
+          printf "\n";
           #check if row exists
           if [ -z "$(sed -n "${num}p" $table)" ]
           then
-            echo "Row does not exist";
+            echo " Sorry, Row does not exist!!";
+            printf "\n";
           else  
             sed -i "${num}d" $table;
-            echo "Row deleted successfully";
+            echo "     ***************Row $num deleted successfully***************";
+            printf "\n";
           fi  
         fi
       else
-          echo "Table not found!!";  
+          echo " Sorry, Table not found!!"; 
+          printf "\n"; 
       fi
 
 }
 
 function dropTable {
 read -p "Select table you want to delete: " table;
+printf "\n";
       if [ -f $table ]
       then
       rm  $table;
       rm  .$table.metadata;
-      echo "Table $table deleted successfully"; 
+      echo "     ***************Table $table deleted successfully***************"; 
+      printf "\n";
       else
-      echo "Table $table not found!!";
+      echo " Sorry, Table $table not found!!";
+      printf "\n";
       fi 
 }
 
@@ -196,6 +227,7 @@ do
  PS3="Select an Option:  ";
  select option in "Create New Table" "List Tables" "Insert Data" "Select Row" "Select all From Table" "Delete Row From Table" "Drop Table" "Back to main menu"
  do
+ printf "\n";
 
 # create a new table
   case $option in
@@ -216,13 +248,18 @@ do
 # Insert Data Into Table
   "Insert Data")
     clear ;
+    echo "     ***************Available tables***************";
+      printf "\n";
     list;
+    printf "\n";
 	  read -p "Select the table you want to insert into:  " tableName;
+    printf "\n";
   	if [ -f $tableName ]
 	  then
 	    insert;
 	  else 
-	 	echo "Table not found";
+	 	echo " Sorry, Table not found!!";
+     printf "\n";
     break; 		
 	  fi
     ;;
