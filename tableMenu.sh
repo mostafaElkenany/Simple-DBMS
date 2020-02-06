@@ -37,8 +37,8 @@ else
         read -p "Enter name for column number [$i]: " colName;
 
         PS3="Choose Column $colName data type: ";
-         select colType in "Integer" "String"
          printf "\n";
+         select colType in "Integer" "String"
          do
           case $colType in
       	   "Integer")

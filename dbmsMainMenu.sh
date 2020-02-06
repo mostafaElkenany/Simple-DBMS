@@ -1,6 +1,7 @@
 #!/usr/bin/bash
-. tableMenu.sh 
 shopt -s extglob;
+
+. tableMenu.sh 
 
  echo "myDB DBMS is running";   
  mkdir -p ~/myDB/Databases ;
@@ -56,7 +57,7 @@ shopt -s extglob;
    then
     cd $db;
     echo "     ***************Now connected to Database $db***************";
-    printf "\n"
+    printf "\n";
     tableOptions;
    else
     echo " Sorry, Database $db not found!!";
