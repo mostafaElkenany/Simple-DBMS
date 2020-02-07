@@ -3,11 +3,14 @@
 function list {
       if [ -z "$(ls)" ]
      then
+      printf "\n";
       echo " There is no tables in this database!!";
+      printf "\n";
+      break;
      else
       echo "     ***************Available tables***************";
       printf "\n";
-      ls | sort -u ;
+      ls | sort -n;
       printf "\n";
      fi  
 }
@@ -43,6 +46,7 @@ else
          while ! [ -z "$(grep -w $colName .$tableName.metadata)" ]
          do
           echo "column with the same name already exists, choose another name";
+          printf "\n";
           read -p "Enter name for column number [$i]: " colName;
           printf "\n";
          done
@@ -66,9 +70,12 @@ else
       	  esac
       	 done
         done
+         printf "\n";
          echo "     ***************Table Created Successfully***************";
+         printf "\n";
       else
         echo " Error while creating the table!!";
+        printf "\n";
       fi
     fi
     fi
@@ -99,6 +106,7 @@ function insert {
             while ! [ "$val" -eq "$val" ] 2>/dev/null;
             do
               echo " Invalid input!, $columnName column datatype is integer";
+              printf "\n";
               read -p "Enter $columnName value: " val;
             done
         fi
@@ -112,12 +120,14 @@ function insert {
         fi
     done
     echo "$row" >> $tableName;
+ printf "\n";
+              echo "     ***************Values inserted successfully***************";
+              printf "\n";
     break;
 }
 
 function selectRow {
 
-      #echo "The available tables in this DB: ";
       list;
       printf "\n";
       read -p "Select table:  " table;
@@ -139,6 +149,7 @@ function selectRow {
             printf "\n";
           else  
             sed -n "${num}p" $table | column -t -s ",";
+            printf "\n";
             echo "     ***************retrieved 1 row successfully***************"
             printf "\n";
           fi  
@@ -152,11 +163,9 @@ function selectRow {
 function selectAll {
 if [ -f $tableName ]
     then
-    echo "     ***************available tables***************";
-    printf "\n";
-     ls;
+     list;
      printf "\n";
-     read -p "Enter table name to select: " availableTable;
+     read -p "Select table:  " availableTable;
      printf "\n";
      if [ -f $availableTable ]
      then
@@ -166,11 +175,13 @@ if [ -f $tableName ]
     echo " Sorry, table is empty!!";
     printf "\n";
     else
-    echo "retrieved data for 1 table";
-     awk 'BEGIN {print "ID"} {print $0}' .$availableTable.metadata | cut -d ':' -f 1 | tr '\n' ',' > tmp ;
-     echo "" >> tmp;
-     awk '{print NR","$0}' $availableTable >> tmp;
-     column -t -s "," tmp;
+     awk 'BEGIN {print "ID"} {print $0}' .$availableTable.metadata | cut -d ':' -f 1 | tr '\n' ',' > .$availableTable.tmp ;
+     echo "" >> .$availableTable.tmp;
+     awk '{print NR","$0}' $availableTable >> .$availableTable.tmp;
+     column -t -s "," .$availableTable.tmp;
+     printf "\n";
+     echo "     ***************retrieved 1 table successfully***************";
+     printf "\n";
      fi
      else
      echo " Sorry, Table doesn't exist!!";
@@ -278,6 +289,7 @@ do
 # Select Row From Table
    "Select Row")
    clear;
+   list;
    selectRow;
    break;
    ;;
@@ -285,6 +297,7 @@ do
 # Select all From Table
     "Select all From Table")
     clear;
+    list;
     selectAll;
     break;
     ;;
@@ -292,6 +305,7 @@ do
 # Delete From Table
     "Delete Row From Table")
     clear;
+    list
     deleteRow;
     break; 
     ;;
