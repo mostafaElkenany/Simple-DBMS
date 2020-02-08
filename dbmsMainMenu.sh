@@ -20,10 +20,10 @@ function listDB {
 function connectToDB {
   read -p "Select Database you want to connect to: " db;
   printf "\n";
-  if [ -z $db ]
+  if [ -z $db ] 2>/dev/null
   then
     echo "No input, please enter database name";
-  elif [ -d $db ] 
+  elif [ -d $db ] 2>/dev/null
   then
     cd $db;
     echo "     ***************Now connected to Database $db***************";
@@ -39,7 +39,7 @@ function connectToDB {
 function drop {
     read -p "Select Database you want to delete: " db;
     printf "\n"
-    if [ -d $db ]
+    if [ -d $db ] 2>/dev/null 
     then
       rm -r $db;
       echo "     ***************Database $db deleted successfully***************"; 
