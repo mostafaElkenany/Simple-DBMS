@@ -20,16 +20,20 @@ function listDB {
 function connectToDB {
   read -p "Select Database you want to connect to: " db;
   printf "\n";
-  if [ -d $db ]
+  if [ -z $db ]
+  then
+    echo "No input, please enter database name";
+  elif [ -d $db ] 
   then
     cd $db;
-  echo "     ***************Now connected to Database $db***************";
+    echo "     ***************Now connected to Database $db***************";
     printf "\n";
     tableOptions;
   else
-    echo " Sorry, Database $db not found!!";
-    printf "\n"
-  fi 
+      echo " Sorry, Database $db not found!!";
+      printf "\n"
+   
+  fi
 }
 ###########################################
 function drop {

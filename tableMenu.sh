@@ -35,7 +35,7 @@ function createTable {
           read -p "Enter the number of column: " colNumber;
           printf "\n";
           #check if colNumber is integer
-          while ! [[ $colNumber =~ ^[1-9]*$ ]];
+          while ! [[ $colNumber =~ ^[1-9]*$ ]] || [ -z $colNumber ];
           do
             echo "Please enter a valid number greater than 0 ";
             read -p "Enter the number of column: " colNumber;
@@ -43,6 +43,13 @@ function createTable {
           for (( i = 1; i <= colNumber ; i++ )); 
           do
             read -p "Enter name for column number [$i]: " colName;
+            while [[ ! $colName  =~ ^[a-zA-Z_]+[a-zA-Z]+[0-9a-zA-Z_]*$ ]]
+            do
+              echo "Invalid formate for column name";
+              printf "\n";
+              read -p "Enter name for column number [$i]: " colName;
+              printf "\n";
+            done
             while ! [ -z "$(grep -w $colName .$tableName.metadata)" ]
             do
               echo "column with the same name already exists, choose another name";
