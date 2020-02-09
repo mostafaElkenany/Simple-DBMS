@@ -45,6 +45,7 @@ printf "\n";
       then
       rm  $table;
       rm  .$table.metadata;
+      rm  .$table.tmp;
       echo "     ***************Table $table deleted successfully***************"; 
       printf "\n";
       else
