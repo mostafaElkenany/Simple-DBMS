@@ -1,10 +1,8 @@
 #!/usr/bin/bash
 
-# shopt -s extglob;
-
 function insert {
     row="";
-    for col in `awk '{print $1}' $tableName.metadata`
+    for col in `awk '{print $1}' .$tableName.metadata`
     do
         columnName=$(echo $col|cut -d ':' -f 1) ;
         columnType=$(echo $col|cut -d ':' -f 2);
@@ -13,24 +11,26 @@ function insert {
         #validation for string datatype
         if test $columnType = "String"
         then
-            while [ -z $val ] || [ "$val" -eq "$val" ] 2>/dev/null;
+            while [ -z $val ] 2>/dev/null || [[ $val =~ [\,\;\:\-\/\\] ]] || [ "$val" -eq "$val" ] 2>/dev/null
             do
-              echo "invalid datatype!, $columnName column datatype is string";
-              read -p "Enter $columnName value: " val;
+              echo " Invalid input!, empty value or special characters are not allowed";
+              printf "\n";
+              read -p "Enter the value of $columnName column: " val;
             done
         fi
 
         #validation for integer datatype
         if test $columnType = "Integer"
         then
-            while ! [ "$val" -eq "$val" ] 2>/dev/null;
+            while ! [ "$val" -eq "$val" ] 2>/dev/null
             do
-              echo "invalid datatype!, $columnName column datatype is integer";
+              echo " Invalid input!, $columnName column datatype is integer";
+              printf "\n";
               read -p "Enter $columnName value: " val;
             done
         fi
 
-        #appending row to table with , as
+        #appending row to table with "," as delimeter
         if test -z $row
         then
             row=$val
@@ -38,8 +38,9 @@ function insert {
             row=$row","$val;
         fi
     done
-    echo "$row" >> $tableName.data;
+    echo "$row" >> $tableName;
+ printf "\n";
+              echo "     ***************Values inserted successfully***************";
+              printf "\n";
     break;
 }
-
-insert

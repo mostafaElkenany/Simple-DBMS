@@ -1,6 +1,11 @@
 #!/usr/bin/bash
+
 shopt -s extglob;
 
+. createTableFunction.sh
+. deleteFunctions.sh
+. selectFunctions.sh
+. insertFunction.sh
 . tableMenu.sh 
 
 
@@ -39,7 +44,10 @@ function connectToDB {
 function drop {
     read -p "Select Database you want to delete: " db;
     printf "\n"
-    if [ -d $db ] 2>/dev/null 
+    if [ -z $db ] 2>/dev/null
+    then
+      echo "No input, please enter database name";
+    elif [ -d $db ] 2>/dev/null 
     then
       rm -r $db;
       echo "     ***************Database $db deleted successfully***************"; 
